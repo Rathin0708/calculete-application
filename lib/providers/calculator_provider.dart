@@ -8,7 +8,7 @@ class CalculatorProvider extends ChangeNotifier {
   String _input = '';
   String _output = '0';
   List<Map<String, dynamic>> _history = [];
-  bool _isSoundEnabled = true;
+  bool _isSoundEnabled = false;
   String _soundTheme = 'default';
   bool _isReadAloudEnabled = false;
   final FlutterTts _flutterTts = FlutterTts();
@@ -282,7 +282,7 @@ class CalculatorProvider extends ChangeNotifier {
   // Load settings
   Future<void> loadSettings() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
-    _isSoundEnabled = prefs.getBool('sound_enabled') ?? true;
+    _isSoundEnabled = prefs.getBool('sound_enabled') ?? false;
     _soundTheme = prefs.getString('sound_theme') ?? 'default';
     _isReadAloudEnabled = prefs.getBool('read_aloud') ?? false;
     await loadHistory();

@@ -6,10 +6,11 @@ import '../widgets/calculator_display.dart';
 import '../widgets/calculator_keypad.dart';
 import '../widgets/settings_panel.dart';
 import '../widgets/history_panel.dart';
-import '../widgets/ar_scanner.dart';
 
 class HomeScreen extends StatefulWidget {
-  const HomeScreen({Key? key}) : super(key: key);
+  const HomeScreen({Key? key, this.initialTabIndex = 0}) : super(key: key);
+
+  final int initialTabIndex;
 
   @override
   State<HomeScreen> createState() => _HomeScreenState();
@@ -23,7 +24,19 @@ class _HomeScreenState extends State<HomeScreen>
   @override
   void initState() {
     super.initState();
-    _tabController = TabController(length: 4, vsync: this);
+    _tabController = TabController(
+        length: 3,
+        vsync: this,
+        initialIndex: widget.initialTabIndex < 3 ? widget.initialTabIndex : 0
+    );
+
+    // Add listener for tab changes
+    _tabController.addListener(() {
+      // This will force a rebuild when tab changes
+      if (_tabController.indexIsChanging) {
+        setState(() {});
+      }
+    });
 
     // Load settings and history
     WidgetsBinding.instance.addPostFrameCallback((_) {
@@ -34,6 +47,7 @@ class _HomeScreenState extends State<HomeScreen>
 
   @override
   void dispose() {
+    _tabController.removeListener(() {});
     _tabController.dispose();
     super.dispose();
   }
@@ -72,11 +86,30 @@ class _HomeScreenState extends State<HomeScreen>
         ],
         bottom: TabBar(
           controller: _tabController,
-          tabs: const [
-            Tab(icon: Icon(Icons.calculate), text: 'Basic'),
-            Tab(icon: Icon(Icons.science), text: 'Scientific'),
-            Tab(icon: Icon(Icons.history), text: 'History'),
-            Tab(icon: Icon(Icons.camera_alt), text: 'AR Scan'),
+          labelColor: Theme
+              .of(context)
+              .colorScheme
+              .secondary,
+          unselectedLabelColor: Theme
+              .of(context)
+              .colorScheme
+              .onPrimary
+              .withOpacity(0.7),
+          indicatorColor: Theme
+              .of(context)
+              .colorScheme
+              .secondary,
+          indicatorWeight: 3,
+          indicatorSize: TabBarIndicatorSize.label,
+          labelStyle: const TextStyle(fontWeight: FontWeight.bold),
+          unselectedLabelStyle: const TextStyle(fontWeight: FontWeight.normal),
+          splashBorderRadius: BorderRadius.circular(20),
+          dividerColor: Colors.transparent,
+          enableFeedback: true,
+          tabs: [
+            _buildTab(Icons.calculate, 'Basic', 0),
+            _buildTab(Icons.science, 'Scientific', 1),
+            _buildTab(Icons.history, 'History', 2),
           ],
         ),
       ),
@@ -88,8 +121,39 @@ class _HomeScreenState extends State<HomeScreen>
           _buildCalculatorView(isScientific: false),
           _buildCalculatorView(isScientific: true),
           const HistoryPanel(),
-          const ARScanner(),
         ],
+      ),
+    );
+  }
+
+  Widget _buildTab(IconData icon, String text, int index) {
+    final isSelected = _tabController.index == index;
+    final color = isSelected
+        ? Theme
+        .of(context)
+        .colorScheme
+        .secondary
+        : Theme
+        .of(context)
+        .colorScheme
+        .onPrimary
+        .withOpacity(0.7);
+
+    return Tab(
+      icon: Icon(
+        icon,
+        color: color,
+        size: isSelected ? 28 : 24,
+      ),
+      child: Padding(
+        padding: const EdgeInsets.only(top: 4),
+        child: Text(
+          text,
+          style: TextStyle(
+            color: color,
+            fontSize: isSelected ? 13 : 12,
+          ),
+        ),
       ),
     );
   }

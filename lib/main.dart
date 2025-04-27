@@ -40,7 +40,7 @@ class MyApp extends StatelessWidget {
               GlobalCupertinoLocalizations.delegate,
             ],
             locale: themeProvider.currentLocale,
-            home: const HomeScreen(),
+            home: const HomeScreen(initialTabIndex: 0),
           );
         },
       ),

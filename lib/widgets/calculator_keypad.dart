@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../providers/calculator_provider.dart';
 import '../providers/theme_provider.dart';
-import 'package:audioplayers/audioplayers.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class CalculatorKeypad extends StatefulWidget {
@@ -18,21 +17,13 @@ class CalculatorKeypad extends StatefulWidget {
 }
 
 class _CalculatorKeypadState extends State<CalculatorKeypad> {
-  late AudioPlayer _audioPlayer;
   List<Map<String, dynamic>> _keypadLayout = [];
   bool _isCustomizing = false;
 
   @override
   void initState() {
     super.initState();
-    _audioPlayer = AudioPlayer();
     _loadKeypadLayout();
-  }
-
-  @override
-  void dispose() {
-    _audioPlayer.dispose();
-    super.dispose();
   }
 
   Future<void> _loadKeypadLayout() async {
@@ -132,20 +123,9 @@ class _CalculatorKeypadState extends State<CalculatorKeypad> {
     await prefs.setString(layoutKey, layoutString);
   }
 
-  void _playButtonSound() {
-    final calculatorProvider = Provider.of<CalculatorProvider>(
-        context, listen: false);
-    if (calculatorProvider.isSoundEnabled) {
-      String soundTheme = calculatorProvider.soundTheme;
-      String soundAsset = 'assets/sounds/${soundTheme}_click.mp3';
-      _audioPlayer.play(AssetSource(soundAsset));
-    }
-  }
-
   void _handleButtonPress(String value) {
     final calculatorProvider = Provider.of<CalculatorProvider>(
         context, listen: false);
-    _playButtonSound();
 
     // Check for easter eggs
     _checkEasterEggs(calculatorProvider.input + value);
