@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../providers/calculator_provider.dart';
-import 'package:intl/intl.dart';
 
 class HistoryPanel extends StatelessWidget {
   const HistoryPanel({Key? key}) : super(key: key);
@@ -83,7 +82,8 @@ class HistoryPanel extends StatelessWidget {
     final calculatorProvider = Provider.of<CalculatorProvider>(
         context, listen: false);
     DateTime timestamp = DateTime.parse(item['timestamp']);
-    String formattedDate = DateFormat('MMM d, yyyy • h:mm a').format(timestamp);
+    // Format date manually without using intl package
+    String formattedDate = _formatDate(timestamp);
     List<String> steps = List<String>.from(item['steps'] ?? []);
 
     return Card(
@@ -145,5 +145,33 @@ class HistoryPanel extends StatelessWidget {
         ],
       ),
     );
+  }
+
+  // Helper method to format date without intl package
+  String _formatDate(DateTime date) {
+    const months = [
+      'Jan',
+      'Feb',
+      'Mar',
+      'Apr',
+      'May',
+      'Jun',
+      'Jul',
+      'Aug',
+      'Sep',
+      'Oct',
+      'Nov',
+      'Dec'
+    ];
+    final month = months[date.month - 1];
+    final day = date.day;
+    final year = date.year;
+
+    final hour = date.hour > 12 ? date.hour - 12 : (date.hour == 0 ? 12 : date
+        .hour);
+    final minute = date.minute.toString().padLeft(2, '0');
+    final period = date.hour >= 12 ? 'PM' : 'AM';
+
+    return '$month $day, $year • $hour:$minute $period';
   }
 }

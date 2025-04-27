@@ -70,18 +70,6 @@ class SettingsPanel extends StatelessWidget {
           _buildSoundSettings(context),
           const SizedBox(height: 16),
 
-          // Language settings
-          const Text(
-            'Language',
-            style: TextStyle(
-              fontSize: 16,
-              fontWeight: FontWeight.bold,
-            ),
-          ),
-          const SizedBox(height: 12),
-          _buildLanguageSelector(context),
-          const SizedBox(height: 16),
-
           // About section with daily challenge
           _buildAboutSection(context),
         ],
@@ -214,92 +202,6 @@ class SettingsPanel extends StatelessWidget {
           onTap();
         }
       },
-    );
-  }
-
-  Widget _buildLanguageSelector(BuildContext context) {
-    final themeProvider = Provider.of<ThemeProvider>(context);
-
-    return SingleChildScrollView(
-      scrollDirection: Axis.horizontal,
-      child: Row(
-        children: [
-          _buildLanguageOption(
-            context,
-            'English',
-            'en',
-            'US',
-            themeProvider.currentLocale.languageCode == 'en',
-          ),
-          _buildLanguageOption(
-            context,
-            'தமிழ் (Tamil)',
-            'ta',
-            'IN',
-            themeProvider.currentLocale.languageCode == 'ta',
-          ),
-          _buildLanguageOption(
-            context,
-            'हिंदी (Hindi)',
-            'hi',
-            'IN',
-            themeProvider.currentLocale.languageCode == 'hi',
-          ),
-          _buildLanguageOption(
-            context,
-            'Español (Spanish)',
-            'es',
-            'ES',
-            themeProvider.currentLocale.languageCode == 'es',
-          ),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildLanguageOption(BuildContext context, String name,
-      String languageCode, String countryCode, bool isSelected) {
-    final themeProvider = Provider.of<ThemeProvider>(context, listen: false);
-
-    return GestureDetector(
-      onTap: () {
-        themeProvider.setLocale(Locale(languageCode, countryCode));
-      },
-      child: Container(
-        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-        margin: const EdgeInsets.only(right: 12),
-        decoration: BoxDecoration(
-          color: isSelected
-              ? Theme
-              .of(context)
-              .colorScheme
-              .primary
-              : Theme
-              .of(context)
-              .colorScheme
-              .surface,
-          borderRadius: BorderRadius.circular(12),
-          border: Border.all(
-            color: Theme
-                .of(context)
-                .colorScheme
-                .primary
-                .withOpacity(0.5),
-          ),
-        ),
-        child: Text(
-          name,
-          style: TextStyle(
-            color: isSelected
-                ? Colors.white
-                : Theme
-                .of(context)
-                .textTheme
-                .bodyMedium
-                ?.color,
-          ),
-        ),
-      ),
     );
   }
 

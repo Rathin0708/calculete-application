@@ -3,8 +3,6 @@ import 'package:provider/provider.dart';
 import 'package:calculater/providers/calculator_provider.dart';
 import 'package:calculater/providers/theme_provider.dart';
 import 'package:calculater/screens/home_screen.dart';
-import 'package:flutter_localizations/flutter_localizations.dart';
-import 'utils/app_localizations.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -27,19 +25,6 @@ class MyApp extends StatelessWidget {
             debugShowCheckedModeBanner: false,
             title: 'Smart Calculator',
             theme: themeProvider.currentTheme,
-            supportedLocales: const [
-              Locale('en', 'US'), // English
-              Locale('ta', 'IN'), // Tamil
-              Locale('hi', 'IN'), // Hindi
-              Locale('es', 'ES'), // Spanish
-            ],
-            localizationsDelegates: const [
-              AppLocalizations.delegate,
-              GlobalMaterialLocalizations.delegate,
-              GlobalWidgetsLocalizations.delegate,
-              GlobalCupertinoLocalizations.delegate,
-            ],
-            locale: themeProvider.currentLocale,
             home: const HomeScreen(initialTabIndex: 0),
           );
         },

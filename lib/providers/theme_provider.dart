@@ -3,13 +3,9 @@ import 'package:shared_preferences/shared_preferences.dart';
 
 class ThemeProvider extends ChangeNotifier {
   ThemeData _currentTheme = lightTheme;
-  Locale _currentLocale = const Locale('en', 'US');
 
   // Getter for current theme
   ThemeData get currentTheme => _currentTheme;
-
-  // Getter for current locale
-  Locale get currentLocale => _currentLocale;
 
   // Light theme
   static final ThemeData lightTheme = ThemeData(
@@ -103,30 +99,13 @@ class ThemeProvider extends ChangeNotifier {
     notifyListeners();
   }
 
-  // Set locale method
-  void setLocale(Locale locale) async {
-    SharedPreferences prefs = await SharedPreferences.getInstance();
-    await prefs.setString('languageCode', locale.languageCode);
-    await prefs.setString('countryCode', locale.countryCode ?? '');
-
-    _currentLocale = locale;
-    notifyListeners();
-  }
-
-  // Initialize theme and locale from shared preferences
+  // Initialize theme from shared preferences
   Future<void> initPreferences() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     String? themeName = prefs.getString('theme');
-    String? languageCode = prefs.getString('languageCode');
-    String? countryCode = prefs.getString('countryCode');
 
     if (themeName != null) {
       setTheme(themeName);
-    }
-
-    if (languageCode != null) {
-      _currentLocale = Locale(languageCode, countryCode ?? '');
-      notifyListeners();
     }
   }
 }
