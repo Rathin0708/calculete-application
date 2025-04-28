@@ -56,26 +56,30 @@ class HistoryPanel extends StatelessWidget {
   }
 
   Widget _buildEmptyHistory() {
-    return Center(
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          Icon(
-            Icons.history,
-            size: 72,
-            color: Colors.grey[400],
-          ),
-          const SizedBox(height: 16),
-          Text(
-            'No calculation history yet',
-            style: TextStyle(
-              fontSize: 16,
-              color: Colors.grey[600],
+    return Builder(builder: (context) {
+      final theme = Theme.of(context);
+      return Center(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Icon(
+              Icons.history,
+              size: 72,
+              color: theme.colorScheme.secondary.withOpacity(0.4),
             ),
-          ),
-        ],
-      ),
-    );
+            const SizedBox(height: 16),
+            Text(
+              'No calculation history yet',
+              style: TextStyle(
+                fontSize: 16,
+                color: theme.colorScheme.primary.withOpacity(0.7),
+                fontWeight: FontWeight.w500,
+              ),
+            ),
+          ],
+        ),
+      );
+    });
   }
 
   Widget _buildHistoryItem(BuildContext context, Map<String, dynamic> item) {
@@ -88,14 +92,29 @@ class HistoryPanel extends StatelessWidget {
 
     return Card(
       margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-      elevation: 1,
+      elevation: 2,
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(12),
+        side: BorderSide(
+          color: Theme
+              .of(context)
+              .colorScheme
+              .primary
+              .withOpacity(0.2),
+          width: 1,
+        ),
+      ),
       child: ExpansionTile(
         tilePadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
         title: Text(
           item['input'],
-          style: const TextStyle(
+          style: TextStyle(
             fontWeight: FontWeight.bold,
             fontSize: 16,
+            color: Theme
+                .of(context)
+                .colorScheme
+                .onSurface,
           ),
         ),
         subtitle: Text(
@@ -105,10 +124,17 @@ class HistoryPanel extends StatelessWidget {
                 .of(context)
                 .colorScheme
                 .secondary,
+            fontWeight: FontWeight.w500,
           ),
         ),
         trailing: IconButton(
-          icon: const Icon(Icons.replay),
+          icon: Icon(
+            Icons.replay,
+            color: Theme
+                .of(context)
+                .colorScheme
+                .primary,
+          ),
           tooltip: 'Reuse this calculation',
           onPressed: () {
             calculatorProvider.setInput(item['input']);
@@ -127,6 +153,7 @@ class HistoryPanel extends StatelessWidget {
                     'Step-by-Step Solution:',
                     style: TextStyle(
                       fontWeight: FontWeight.bold,
+                      fontSize: 15,
                       color: Theme
                           .of(context)
                           .colorScheme
@@ -137,7 +164,15 @@ class HistoryPanel extends StatelessWidget {
                   ...steps.map((step) =>
                       Padding(
                         padding: const EdgeInsets.only(bottom: 8.0),
-                        child: Text('• $step'),
+                        child: Text(
+                          '• $step',
+                          style: TextStyle(
+                            color: Theme
+                                .of(context)
+                                .colorScheme
+                                .onSurface,
+                          ),
+                        ),
                       )),
                 ],
               ),

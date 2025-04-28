@@ -146,24 +146,94 @@ class _CalculatorKeypadState extends State<CalculatorKeypad> {
   }
 
   void _checkEasterEggs(String input) {
-    // Example easter egg: typing "123+" unlocks a secret theme
-    if (input == "123+") {
-      _unlockSecretTheme();
+    final themeProvider = Provider.of<ThemeProvider>(context, listen: false);
+
+    // Easter egg theme codes
+    Map<String, Map<String, dynamic>> easterEggs = {
+      "123+": {
+        "theme": "rainbow",
+        "message": "Rainbow theme unlocked! 🌈✨",
+        "color": Color(0xFF9C27B0),
+      },
+      "007=": {
+        "theme": "midnight",
+        "message": "Secret agent mode activated! 🕵️",
+        "color": Color(0xFF263238),
+      },
+      "42*42": {
+        "theme": "deep_ocean",
+        "message": "The answer to everything is... deep blue! 🌊",
+        "color": Color(0xFF0D47A1),
+      },
+      "1337=": {
+        "theme": "emerald",
+        "message": "Elite hacker mode engaged! 💻",
+        "color": Color(0xFF00897B),
+      },
+      "0000": {
+        "theme": "berry",
+        "message": "Sweet berry theme unlocked! 🍓",
+        "color": Color(0xFF9C27B0),
+      },
+    };
+
+    // Check if the input matches any easter egg codes
+    if (easterEggs.containsKey(input)) {
+      final egg = easterEggs[input]!;
+      _unlockSecretTheme(egg["theme"] as String, egg["message"] as String,
+          egg["color"] as Color);
     }
   }
 
-  void _unlockSecretTheme() {
+  void _unlockSecretTheme(String theme, String message, Color backgroundColor) {
     final themeProvider = Provider.of<ThemeProvider>(context, listen: false);
+
+    // Show an animated snackbar
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
-        content: const Text('Secret rainbow theme unlocked!'),
-        backgroundColor: Colors.purple,
-        duration: const Duration(seconds: 2),
+        content: Row(
+          children: [
+            Icon(Icons.auto_awesome, color: Colors.white),
+            SizedBox(width: 10),
+            Expanded(
+              child: Text(
+                message,
+                style: TextStyle(fontWeight: FontWeight.bold),
+              ),
+            ),
+          ],
+        ),
+        backgroundColor: backgroundColor,
+        duration: const Duration(seconds: 3),
+        behavior: SnackBarBehavior.floating,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(10),
+        ),
+        action: SnackBarAction(
+          label: 'COOL!',
+          textColor: Colors.white,
+          onPressed: () {
+            ScaffoldMessenger.of(context).hideCurrentSnackBar();
+          },
+        ),
       ),
     );
 
-    // In a real app, you'd have a custom theme defined in the theme provider
-    // themeProvider.setTheme('rainbow');
+    // Apply the theme
+    themeProvider.setTheme(theme);
+
+    // Optionally, save that this easter egg has been discovered
+    _saveDiscoveredEasterEgg(theme);
+  }
+
+  Future<void> _saveDiscoveredEasterEgg(String theme) async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    List<String> discoveredEggs = prefs.getStringList('discovered_eggs') ?? [];
+
+    if (!discoveredEggs.contains(theme)) {
+      discoveredEggs.add(theme);
+      await prefs.setStringList('discovered_eggs', discoveredEggs);
+    }
   }
 
   void _toggleCustomizationMode() {

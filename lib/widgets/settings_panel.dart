@@ -3,8 +3,24 @@ import 'package:provider/provider.dart';
 import '../providers/theme_provider.dart';
 import '../providers/calculator_provider.dart';
 
-class SettingsPanel extends StatelessWidget {
+class SettingsPanel extends StatefulWidget {
   const SettingsPanel({Key? key}) : super(key: key);
+
+  @override
+  State<SettingsPanel> createState() => _SettingsPanelState();
+}
+
+class _SettingsPanelState extends State<SettingsPanel> {
+  String _selectedThemeCategory = 'All';
+
+  final List<String> _themeCategories = [
+    'All',
+    'Light',
+    'Dark',
+    'Colorful',
+    'Nature',
+    'Basic'
+  ];
 
   @override
   Widget build(BuildContext context) {
@@ -80,40 +96,176 @@ class SettingsPanel extends StatelessWidget {
   Widget _buildThemeSelector(BuildContext context) {
     final themeProvider = Provider.of<ThemeProvider>(context);
 
-    return SingleChildScrollView(
-      scrollDirection: Axis.horizontal,
-      child: Row(
-        children: [
-          _buildThemeOption(
-            context,
-            'Light',
-            Colors.blue,
-            Colors.white,
-                () => themeProvider.setTheme('light'),
+    // Define theme categories
+    final Map<String, List<Map<String, dynamic>>> themesByCategory = {
+      'All': [],
+      'Light': [
+        {'name': 'Light', 'color': Colors.blue, 'theme': 'light'},
+        {
+          'name': 'Professional',
+          'color': Colors.blueGrey,
+          'theme': 'professional'
+        },
+        {'name': 'Mint', 'color': Color(0xFF00BFA5), 'theme': 'mint'},
+        {'name': 'Sunset', 'color': Color(0xFFFF7043), 'theme': 'sunset'},
+        {'name': 'Forest', 'color': Color(0xFF2E7D32), 'theme': 'forest'},
+        {'name': 'Lavender', 'color': Color(0xFF673AB7), 'theme': 'lavender'},
+        {'name': 'Coffee', 'color': Color(0xFF795548), 'theme': 'coffee'},
+      ],
+      'Dark': [
+        {'name': 'Dark', 'color': Color(0xFF1F1F1F), 'theme': 'dark'},
+        {
+          'name': 'Deep Ocean',
+          'color': Color(0xFF0D47A1),
+          'theme': 'deep_ocean'
+        },
+        {'name': 'Midnight', 'color': Color(0xFF263238), 'theme': 'midnight'},
+      ],
+      'Colorful': [
+        {'name': 'Fun', 'color': Colors.purple, 'theme': 'fun'},
+        {'name': 'Colorful', 'color': Color(0xFFE040FB), 'theme': 'colorful'},
+        {'name': 'Berry', 'color': Color(0xFF9C27B0), 'theme': 'berry'},
+        {'name': 'Coral', 'color': Color(0xFFE91E63), 'theme': 'coral'},
+        {'name': 'Amber', 'color': Color(0xFFFFA000), 'theme': 'amber'},
+      ],
+      'Nature': [
+        {'name': 'Forest', 'color': Color(0xFF2E7D32), 'theme': 'forest'},
+        {'name': 'Mint', 'color': Color(0xFF00BFA5), 'theme': 'mint'},
+        {'name': 'Aqua', 'color': Color(0xFF00ACC1), 'theme': 'aqua'},
+        {'name': 'Emerald', 'color': Color(0xFF00897B), 'theme': 'emerald'},
+        {
+          'name': 'Deep Ocean',
+          'color': Color(0xFF0D47A1),
+          'theme': 'deep_ocean'
+        },
+      ],
+      'Basic': [
+        {'name': 'Light', 'color': Colors.blue, 'theme': 'light'},
+        {'name': 'Dark', 'color': Color(0xFF1F1F1F), 'theme': 'dark'},
+        {'name': 'Ruby', 'color': Color(0xFFD32F2F), 'theme': 'ruby'},
+        {'name': 'Royal', 'color': Color(0xFF3F51B5), 'theme': 'royal'},
+      ],
+    };
+
+    // Populate the "All" category with all themes
+    themesByCategory['All'] = [
+      {'name': 'Light', 'color': Colors.blue, 'theme': 'light'},
+      {'name': 'Dark', 'color': Color(0xFF1F1F1F), 'theme': 'dark'},
+      {
+        'name': 'Professional',
+        'color': Colors.blueGrey,
+        'theme': 'professional'
+      },
+      {'name': 'Fun', 'color': Colors.purple, 'theme': 'fun'},
+      {'name': 'Colorful', 'color': Color(0xFFE040FB), 'theme': 'colorful'},
+      {'name': 'Mint', 'color': Color(0xFF00BFA5), 'theme': 'mint'},
+      {'name': 'Deep Ocean', 'color': Color(0xFF0D47A1), 'theme': 'deep_ocean'},
+      {'name': 'Sunset', 'color': Color(0xFFFF7043), 'theme': 'sunset'},
+      {'name': 'Forest', 'color': Color(0xFF2E7D32), 'theme': 'forest'},
+      {'name': 'Berry', 'color': Color(0xFF9C27B0), 'theme': 'berry'},
+      {'name': 'Coffee', 'color': Color(0xFF795548), 'theme': 'coffee'},
+      {'name': 'Midnight', 'color': Color(0xFF263238), 'theme': 'midnight'},
+      {'name': 'Lavender', 'color': Color(0xFF673AB7), 'theme': 'lavender'},
+      {'name': 'Coral', 'color': Color(0xFFE91E63), 'theme': 'coral'},
+      {'name': 'Amber', 'color': Color(0xFFFFA000), 'theme': 'amber'},
+      {'name': 'Aqua', 'color': Color(0xFF00ACC1), 'theme': 'aqua'},
+      {'name': 'Ruby', 'color': Color(0xFFD32F2F), 'theme': 'ruby'},
+      {'name': 'Emerald', 'color': Color(0xFF00897B), 'theme': 'emerald'},
+      {'name': 'Royal', 'color': Color(0xFF3F51B5), 'theme': 'royal'},
+    ];
+
+    final List<Map<String,
+        dynamic>> displayThemes = themesByCategory[_selectedThemeCategory] ??
+        [];
+
+    return Column(
+      children: [
+        // Category Selector
+        Container(
+          height: 40,
+          margin: EdgeInsets.only(bottom: 8),
+          child: ListView.builder(
+            scrollDirection: Axis.horizontal,
+            itemCount: _themeCategories.length,
+            itemBuilder: (context, index) {
+              final category = _themeCategories[index];
+              final isSelected = _selectedThemeCategory == category;
+
+              return GestureDetector(
+                onTap: () {
+                  setState(() {
+                    _selectedThemeCategory = category;
+                  });
+                },
+                child: Container(
+                  padding: EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                  margin: EdgeInsets.only(right: 8),
+                  decoration: BoxDecoration(
+                    color: isSelected
+                        ? Theme
+                        .of(context)
+                        .colorScheme
+                        .primary
+                        : Theme
+                        .of(context)
+                        .colorScheme
+                        .surface,
+                    borderRadius: BorderRadius.circular(20),
+                    boxShadow: isSelected ? [
+                      BoxShadow(
+                        color: Theme
+                            .of(context)
+                            .colorScheme
+                            .primary
+                            .withOpacity(0.3),
+                        blurRadius: 4,
+                        offset: Offset(0, 2),
+                      )
+                    ] : null,
+                  ),
+                  child: Text(
+                    category,
+                    style: TextStyle(
+                      color: isSelected
+                          ? Colors.white
+                          : Theme
+                          .of(context)
+                          .colorScheme
+                          .onSurface,
+                      fontWeight: isSelected ? FontWeight.bold : FontWeight
+                          .normal,
+                    ),
+                  ),
+                ),
+              );
+            },
           ),
-          _buildThemeOption(
-            context,
-            'Dark',
-            Color(0xFF1F1F1F),
-            Colors.white,
-                () => themeProvider.setTheme('dark'),
+        ),
+
+        // Theme Grid
+        SizedBox(
+          height: 180,
+          child: GridView.builder(
+            gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+              crossAxisCount: 3,
+              childAspectRatio: 1.5,
+              crossAxisSpacing: 8,
+              mainAxisSpacing: 8,
+            ),
+            itemCount: displayThemes.length,
+            itemBuilder: (context, index) {
+              final theme = displayThemes[index];
+              return _buildThemeOption(
+                context,
+                theme['name'],
+                theme['color'],
+                Colors.white,
+                    () => themeProvider.setTheme(theme['theme']),
+              );
+            },
           ),
-          _buildThemeOption(
-            context,
-            'Professional',
-            Colors.blueGrey,
-            Colors.white,
-                () => themeProvider.setTheme('professional'),
-          ),
-          _buildThemeOption(
-            context,
-            'Fun',
-            Colors.purple,
-            Colors.white,
-                () => themeProvider.setTheme('fun'),
-          ),
-        ],
-      ),
+        ),
+      ],
     );
   }
 
@@ -122,19 +274,25 @@ class SettingsPanel extends StatelessWidget {
     return GestureDetector(
       onTap: onTap,
       child: Container(
-        width: 100,
-        height: 70,
-        margin: const EdgeInsets.only(right: 12),
         decoration: BoxDecoration(
           color: color,
           borderRadius: BorderRadius.circular(12),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black.withOpacity(0.1),
+              blurRadius: 4,
+              offset: Offset(0, 2),
+            ),
+          ],
         ),
         alignment: Alignment.center,
         child: Text(
           name,
+          textAlign: TextAlign.center,
           style: TextStyle(
             color: textColor,
             fontWeight: FontWeight.bold,
+            fontSize: 12,
           ),
         ),
       ),
